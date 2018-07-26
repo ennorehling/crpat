@@ -37,6 +37,7 @@ int main(int argc, char **argv) {
                 filename, strerror(errno));
             return errno;
         }
+        fseek(in, 3, SEEK_CUR); /* hack: skip the BOM */
     }
 
     cp = CR_ParserCreate();
