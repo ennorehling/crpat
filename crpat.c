@@ -8,7 +8,7 @@ struct CR_ParserStruct {
     const char *m_bufferPtr;
     char *m_bufferEnd;
     CR_ElementHandler m_elementHandler;
-    enum XML_Error m_errorCode;
+    enum CR_Error m_errorCode;
     int m_lineNumber;
 };
 
