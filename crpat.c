@@ -123,7 +123,7 @@ static enum CR_Error handle_line(CR_Parser parser, char * s, size_t len) {
         if (parser->m_elementHandler) {
             int i = 0;
             const char *name = s;
-            char *atts[CR_MAXATTR];
+            const char *atts[CR_MAXATTR];
             while (s && *s && i < CR_MAXATTR) {
                 char * p = memchr(s, ' ', len);
                 if (p) {
