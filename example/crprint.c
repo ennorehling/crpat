@@ -28,7 +28,7 @@ int main(int argc, char **argv) {
     char buf[2048];
     int done = 0, err = 0;
 
-    if (argc > 0) {
+    if (argc > 1) {
         filename = argv[1];
         in = fopen(filename, "rt+");
         if (!in) {
