@@ -38,4 +38,8 @@ typedef void (*CR_ElementHandler) (void *userData, const CR_Char *name,
 
 void CR_SetElementHandler(CR_Parser parser, CR_ElementHandler handler);
 enum CR_Status CR_Parse(CR_Parser parser, const char *s, int len, int isFinal);
-
+int CR_GetCurrentLineNumber(CR_Parser parser);
+int CR_GetErrorCode(CR_Parser parser);
+const char *CR_ErrorString(enum CR_Error error);
+void CR_SetUserData(CR_Parser parser, void *userData);
+void *CR_GetUserData(CR_Parser parser);
