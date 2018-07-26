@@ -10,14 +10,23 @@
 #include <errno.h>
 
 static void handle_element(void *udata, const char *name, const char **attr) {
-    int i;
     FILE * F = (FILE *)udata;
-
+    int i;
     fprintf(F, "%s ", name);
     for (i = 0; attr[i]; ++i) {
         fprintf(F, "%s ", attr[i]);
     }
     fputc('\n', F);
+}
+
+static void handle_property(void *udata, const char *name, const char *value) {
+    FILE * F = (FILE *)udata;
+    fprintf(F, "%s: %s\n", name, value);
+}
+
+static void handle_text(void *udata, const char *text) {
+    FILE * F = (FILE *)udata;
+    fputs(text, F);
 }
 
 int main(int argc, char **argv) {
@@ -42,6 +51,8 @@ int main(int argc, char **argv) {
 
     cp = CR_ParserCreate();
     CR_SetElementHandler(cp, handle_element);
+    CR_SetPropertyHandler(cp, handle_property);
+    CR_SetTextHandler(cp, handle_text);
     CR_SetUserData(cp, (void *)out);
 
     while (!done) {

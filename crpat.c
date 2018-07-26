@@ -88,12 +88,13 @@ static enum CR_Error buffer_append(CR_Parser parser, const char *s, int len)
         char * buffer;
         total += (parser->m_bufferEnd - parser->m_bufferPtr);
         buffer = malloc(total);
+        memcpy(buffer, parser->m_bufferPtr, total - len);
+        memcpy(buffer + total - len, s, len);
         free(parser->m_buffer);
         parser->m_buffer = buffer;
         if (!parser->m_buffer) {
             return CR_ERROR_NO_MEMORY;
         }
-        memcpy(parser->m_buffer, s, len);
         parser->m_bufferPtr = parser->m_buffer;
         parser->m_bufferEnd = parser->m_buffer + total;
     }
@@ -103,19 +104,27 @@ static enum CR_Error buffer_append(CR_Parser parser, const char *s, int len)
 static enum CR_Error handle_line(CR_Parser parser, char * s, size_t len) {
     char ch = s[0];
     if (ch == '\"') {
+        if (len <= 1) {
+            return CR_ERROR_SYNTAX;
+        }
         /* either text or string property */
-    }
-    else if (ch >= '0' && ch <= '9') {
-        /* integer property */
-        if (parser->m_propertyHandler) {
-            char * name = memchr(s, ';', len);
-            if (name) {
-                *name++ = '\0';
+        if (s[len - 1] == '\"') {
+            /* it is text */
+            if (parser->m_textHandler) {
+                s[len - 1] = 0;
+                parser->m_textHandler(parser->m_userData, s + 1);
             }
-            else {
+        }
+        else {
+            /* must be a string property */
+            char *q = strrchr(s, '\"');
+            if (!q || q[1] != ';') {
                 return CR_ERROR_SYNTAX;
             }
-            parser->m_propertyHandler(parser->m_userData, name, s);
+            if (parser->m_propertyHandler) {
+                *q = '\0';
+                parser->m_propertyHandler(parser->m_userData, q + 2, s + 1);
+            }
         }
     }
     else if (ch >= 'A' && ch <= 'Z') {
@@ -134,6 +143,22 @@ static enum CR_Error handle_line(CR_Parser parser, char * s, size_t len) {
             }
             parser->m_elementHandler(parser->m_userData, name, atts);
         }
+    }
+    else if (ch == '-' || (ch >= '0' && ch <= '9')) {
+        /* integer property */
+        if (parser->m_propertyHandler) {
+            char * name = memchr(s, ';', len);
+            if (name) {
+                *name++ = '\0';
+            }
+            else {
+                return CR_ERROR_SYNTAX;
+            }
+            parser->m_propertyHandler(parser->m_userData, name, s);
+        }
+    }
+    else {
+        return CR_ERROR_SYNTAX;
     }
     return CR_ERROR_NONE;
 }
@@ -159,6 +184,7 @@ static enum CR_Status parse_buffer(CR_Parser parser, int isFinal)
             /* we are not at EOF yet, wait for more data */
             break;
         }
+        ++parser->m_lineNumber;
         code = handle_line(parser, s, len);
         if (code != CR_ERROR_NONE) {
             parser->m_errorCode = code;
