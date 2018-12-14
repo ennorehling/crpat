@@ -12,12 +12,6 @@ ADD_LIBRARY (crpat
 #TARGET_LINK_LIBRARIES (test_crpat crpat)
 #ADD_TEST (crpat test_crpat)
 
-IF (MSVC)
-    include (MSVC)
-    MSVC_CRT_SECURE_NO_WARNINGS (crpat)
-#    MSVC_CRT_SECURE_NO_WARNINGS (test_crpat)
-ENDIF (MSVC)
-
 SET (CRPAT_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR} CACHE INTERNAL "crpat headers")
 SET (CRPAT_LIBRARIES crpat CACHE INTERNAL "crpat libraries")
 
