@@ -23,11 +23,28 @@ struct CR_ParserStruct {
     CR_TextHandler m_textHandler;
     enum CR_Error m_errorCode;
     int m_lineNumber;
+    enum CR_Status m_status;
 };
+
+enum CR_Status CR_StopParser(CR_Parser parser)
+{
+    if (parser->m_status == CR_STATUS_OK) {
+        parser->m_status = CR_STATUS_SUSPENDED;
+        return CR_STATUS_OK;
+    }
+    else if (parser->m_status == CR_STATUS_SUSPENDED) {
+        parser->m_errorCode = CR_ERROR_SUSPENDED;
+    }
+    else {
+        parser->m_errorCode = CR_ERROR_FINISHED;
+    }
+    return CR_STATUS_ERROR;
+}
 
 CR_Parser CR_ParserCreate(void)
 {
     CR_Parser parser = calloc(1, sizeof(struct CR_ParserStruct));
+    // CR_ParserReset(parser);
     return parser;
 }
 
@@ -43,6 +60,7 @@ void CR_ParserReset(CR_Parser parser)
     parser->m_propertyHandler = NULL;
     parser->m_textHandler = NULL;
     parser->m_errorCode = CR_ERROR_NONE;
+    parser->m_status = CR_STATUS_OK;
     parser->m_lineNumber = 0;
     parser->m_userData = NULL;
     free(parser->m_buffer);
@@ -160,7 +178,7 @@ static enum CR_Error handle_line(CR_Parser parser, char * s, size_t len) {
     else {
         return CR_ERROR_SYNTAX;
     }
-    return CR_ERROR_NONE;
+    return parser->m_errorCode;
 }
 
 static enum CR_Status parse_buffer(CR_Parser parser, int isFinal)
@@ -190,8 +208,11 @@ static enum CR_Status parse_buffer(CR_Parser parser, int isFinal)
             parser->m_errorCode = code;
             return CR_STATUS_ERROR;
         }
+        if (parser->m_status != CR_STATUS_OK) {
+            return parser->m_status;
+        }
     }
-    return CR_STATUS_OK;
+    return parser->m_status;
 }
 
 enum CR_Status CR_Parse(CR_Parser parser, const char *s, int len, int isFinal)
@@ -229,6 +250,10 @@ const char *CR_ErrorString(enum CR_Error code)
         return CR_T("out of memory");
     case CR_ERROR_SYNTAX:
         return CR_T("syntax error");
+    case CR_ERROR_SUSPENDED:
+        return CR_T("already suspended");
+    case CR_ERROR_FINISHED:
+        return CR_T("already finished");
     }
     return NULL;
 }

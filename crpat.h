@@ -4,20 +4,24 @@ struct CR_ParserStruct;
 typedef struct CR_ParserStruct *CR_Parser;
 
 enum CR_Status {
-    CR_STATUS_ERROR = 0,
-    CR_STATUS_OK = 1,
+    CR_STATUS_OK = 0,
+    CR_STATUS_ERROR = 1,
     CR_STATUS_SUSPENDED = 2
 };
 
 enum CR_Error {
     CR_ERROR_NONE,
     CR_ERROR_NO_MEMORY,
-    CR_ERROR_SYNTAX
+    CR_ERROR_SYNTAX,
+    CR_ERROR_SUSPENDED,
+    CR_ERROR_FINISHED,
 };
 
 CR_Parser CR_ParserCreate(void);
 void CR_ParserFree(CR_Parser parser);
 void CR_ParserReset(CR_Parser parser);
+
+enum CR_Status CR_StopParser(CR_Parser parser);
 
 typedef void(*CR_ElementHandler) (void *userData, const char *name,
     const char **atts);
