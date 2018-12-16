@@ -9,12 +9,13 @@
 #include <string.h>
 #include <errno.h>
 
-static void handle_element(void *udata, const char *name, const char **attr) {
+static void handle_element(void *udata, const char *name, 
+                           unsigned int keyc, int keyv[]) {
     FILE * F = (FILE *)udata;
-    int i;
+    unsigned int i;
     fprintf(F, "%s ", name);
-    for (i = 0; attr[i]; ++i) {
-        fprintf(F, "%s ", attr[i]);
+    for (i = 0; i != keyc; ++i) {
+        fprintf(F, "%d ", keyv[i]);
     }
     fputc('\n', F);
 }
