@@ -24,13 +24,16 @@ void CR_ParserReset(CR_Parser parser);
 enum CR_Status CR_StopParser(CR_Parser parser);
 
 typedef void(*CR_ElementHandler) (void *userData, const char *name,
-    const char **atts);
+    unsigned int keyc, int keyv[]);
 typedef void(*CR_PropertyHandler) (void *userData, const char *name,
     const char *value);
+typedef void(*CR_NumberHandler) (void *userData, const char *name,
+    double value);
 typedef void(*CR_TextHandler) (void *userData, const char *value);
 
 void CR_SetElementHandler(CR_Parser parser, CR_ElementHandler handler);
 void CR_SetPropertyHandler(CR_Parser parser, CR_PropertyHandler handler);
+void CR_SetNumberHandler(CR_Parser parser, CR_NumberHandler handler);
 void CR_SetTextHandler(CR_Parser parser, CR_TextHandler handler);
 enum CR_Status CR_Parse(CR_Parser parser, const char *s, int len, int isFinal);
 int CR_GetCurrentLineNumber(CR_Parser parser);

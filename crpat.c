@@ -20,6 +20,7 @@ struct CR_ParserStruct {
     const char *m_bufferEnd;
     CR_ElementHandler m_elementHandler;
     CR_PropertyHandler m_propertyHandler;
+    CR_NumberHandler m_numberHandler;
     CR_TextHandler m_textHandler;
     enum CR_Error m_errorCode;
     int m_lineNumber;
@@ -77,6 +78,11 @@ void CR_SetElementHandler(CR_Parser parser, CR_ElementHandler handler)
 void CR_SetPropertyHandler(CR_Parser parser, CR_PropertyHandler handler)
 {
     parser->m_propertyHandler = handler;
+}
+
+void CR_SetNumberHandler(CR_Parser parser, CR_NumberHandler handler)
+{
+    parser->m_numberHandler = handler;
 }
 
 void CR_SetTextHandler(CR_Parser parser, CR_TextHandler handler)
@@ -148,23 +154,36 @@ static enum CR_Error handle_line(CR_Parser parser, char * s, size_t len) {
     else if (ch >= 'A' && ch <= 'Z') {
         /* new element */
         if (parser->m_elementHandler) {
-            int i = 0;
+            unsigned int i = 0;
             const char *name = s;
-            const char *atts[CR_MAXATTR];
+            int keys[CR_MAXATTR];
             while (s && *s && i < CR_MAXATTR) {
                 char * p = memchr(s, ' ', len);
                 if (p) {
                     len -= 1 + (p - s);
                     *p++ = '\0';
                 }
-                atts[i++] = s = p;
+                if ((s = p) != NULL) {
+                    keys[i++] = atoi(s);
+                }
             }
-            parser->m_elementHandler(parser->m_userData, name, atts);
+            parser->m_elementHandler(parser->m_userData, name, i, keys);
         }
     }
     else if (ch == '-' || (ch >= '0' && ch <= '9')) {
         /* integer property */
-        if (parser->m_propertyHandler) {
+        if (parser->m_numberHandler) {
+            char * name = memchr(s, ';', len);
+            double num;
+            if (name) {
+                *name++ = '\0';
+            }
+            else {
+                return CR_ERROR_SYNTAX;
+            }
+            num = strtod(s, NULL);
+            parser->m_numberHandler(parser->m_userData, name, num);
+        } else if (parser->m_propertyHandler) {
             char * name = memchr(s, ';', len);
             if (name) {
                 *name++ = '\0';
