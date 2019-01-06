@@ -135,7 +135,15 @@ static enum CR_Error handle_line(CR_Parser parser, char * s, size_t len) {
         if (s[len - 1] == '\"') {
             /* it is text */
             if (parser->m_textHandler) {
+                char *p = s + 1;
                 s[len - 1] = 0;
+                while (p) {
+                    p = strchr(p, '\\');
+                    if (p) {
+                        memmove(p, p + 1, len - (p - s) - 1);
+                        p = p + 1;
+                    }
+                }
                 parser->m_textHandler(parser->m_userData, s + 1);
             }
         }
