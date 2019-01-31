@@ -27,8 +27,7 @@ typedef void(*CR_ElementHandler) (void *userData, const char *name,
     unsigned int keyc, int keyv[]);
 typedef void(*CR_PropertyHandler) (void *userData, const char *name,
     const char *value);
-typedef void(*CR_NumberHandler) (void *userData, const char *name,
-    unsigned int count, double *values);
+typedef void(*CR_NumberHandler) (void *userData, const char *name, long value);
 typedef void(*CR_TextHandler) (void *userData, const char *value);
 
 void CR_SetElementHandler(CR_Parser parser, CR_ElementHandler handler);

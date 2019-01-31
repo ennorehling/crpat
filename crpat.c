@@ -125,8 +125,6 @@ static enum CR_Error buffer_append(CR_Parser parser, const char *s, int len)
     return CR_ERROR_NONE;
 }
 
-#define MAX_NUMBERS 3
-
 static enum CR_Error handle_line(CR_Parser parser, char * s, size_t len) {
     char ch = s[0];
     if (ch == '\"') {
@@ -181,34 +179,18 @@ static enum CR_Error handle_line(CR_Parser parser, char * s, size_t len) {
         }
     }
     else if (ch == '-' || (ch >= '0' && ch <= '9')) {
+        long num;
+        char *src, *name = memchr(s, ';', len);
+        if (!name) {
+            return CR_ERROR_SYNTAX;
+        }
+        *name++ = '\0';
+        num = strtol(s, &src, 10);
+
         /* integer property */
-        if (parser->m_numberHandler) {
-            char * name = memchr(s, ';', len);
-            char *src;
-            double numbers[MAX_NUMBERS];
-            unsigned int n = 0;
-            if (name) {
-                *name++ = '\0';
-            }
-            else {
-                return CR_ERROR_SYNTAX;
-            }
-            for (;;) {
-                double num = strtod(s, &src);
-                assert(n < MAX_NUMBERS);
-                numbers[n++] = num;
-                if (*src++ != ' ') break;
-                s = src;
-            }
-            parser->m_numberHandler(parser->m_userData, name, n, numbers);
+        if (*src == '\0' && parser->m_numberHandler) {
+            parser->m_numberHandler(parser->m_userData, name, num);
         } else if (parser->m_propertyHandler) {
-            char * name = memchr(s, ';', len);
-            if (name) {
-                *name++ = '\0';
-            }
-            else {
-                return CR_ERROR_SYNTAX;
-            }
             parser->m_propertyHandler(parser->m_userData, name, s);
         }
     }
