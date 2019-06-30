@@ -208,9 +208,21 @@ static enum CR_Status parse_buffer(CR_Parser parser, int isFinal)
         char * s = parser->m_bufferPtr;
         char * eol = memchr(s, '\n', len);
         if (eol) {
+            while (eol > parser->m_bufferPtr) {
+                if (*(eol-1) != '\r') break;
+                --eol;
+            }
             len = eol - parser->m_bufferPtr;
             *eol = '\0';
+
             parser->m_bufferPtr += len + 1;
+            while (parser->m_bufferPtr < parser->m_bufferEnd) {
+                char ch = parser->m_bufferPtr[0];
+                if (ch!='\r' && ch!='\n') {
+                    break;
+                }
+                ++parser->m_bufferPtr;
+            }
         }
         else if (isFinal) {
             /* parse until EOF */
