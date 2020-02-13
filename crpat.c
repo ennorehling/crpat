@@ -96,7 +96,7 @@ static void buffer_free(CR_Parser parser)
     parser->m_bufferEnd = parser->m_bufferPtr = parser->m_buffer = NULL;
 }
 
-static enum CR_Error buffer_append(CR_Parser parser, const char *s, int len)
+static enum CR_Error buffer_append(CR_Parser parser, const char *s, size_t len)
 {
     if (parser->m_buffer == NULL) {
         parser->m_buffer = malloc(len);
@@ -246,7 +246,7 @@ static enum CR_Status parse_buffer(CR_Parser parser, int isFinal)
     return parser->m_status;
 }
 
-enum CR_Status CR_Parse(CR_Parser parser, const char *s, int len, int isFinal)
+enum CR_Status CR_Parse(CR_Parser parser, const char *s, size_t len, int isFinal)
 {
     enum CR_Error code;
     if (parser->m_bufferPtr >= parser->m_bufferEnd) {

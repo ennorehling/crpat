@@ -34,7 +34,7 @@ void CR_SetElementHandler(CR_Parser parser, CR_ElementHandler handler);
 void CR_SetPropertyHandler(CR_Parser parser, CR_PropertyHandler handler);
 void CR_SetNumberHandler(CR_Parser parser, CR_NumberHandler handler);
 void CR_SetTextHandler(CR_Parser parser, CR_TextHandler handler);
-enum CR_Status CR_Parse(CR_Parser parser, const char *s, int len, int isFinal);
+enum CR_Status CR_Parse(CR_Parser parser, const char *s, size_t len, int isFinal);
 int CR_GetCurrentLineNumber(CR_Parser parser);
 int CR_GetErrorCode(CR_Parser parser);
 const char *CR_ErrorString(enum CR_Error error);
