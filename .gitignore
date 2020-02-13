@@ -45,7 +45,9 @@
 # Kernel Module Compile Results
 *.mod*
 *.cmd
+.gdb_history
 .tmp_versions/
+build/
 modules.order
 Module.symvers
 Mkfile.old
