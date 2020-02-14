@@ -165,6 +165,7 @@ static enum CR_Error handle_line(CR_Parser parser, char * s, size_t len) {
             unsigned int i = 0;
             const char *name = s;
             int keys[CR_MAXATTR];
+            enum CR_Error err;
             while (s && *s && i < CR_MAXATTR) {
                 char * p = memchr(s, ' ', len);
                 if (p) {
@@ -175,7 +176,10 @@ static enum CR_Error handle_line(CR_Parser parser, char * s, size_t len) {
                     keys[i++] = atoi(s);
                 }
             }
-            parser->m_elementHandler(parser->m_userData, name, i, keys);
+            err = parser->m_elementHandler(parser->m_userData, name, i, keys);
+            if (err != CR_ERROR_NONE) {
+                return err;
+            }
         }
     }
     else if (ch == '-' || (ch >= '0' && ch <= '9')) {

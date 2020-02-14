@@ -11,7 +11,7 @@
 #include <string.h>
 #include <errno.h>
 
-static void handle_element(void *udata, const char *name, 
+static int handle_element(void *udata, const char *name, 
                            unsigned int keyc, int keyv[]) {
     FILE * F = (FILE *)udata;
     unsigned int i;
@@ -20,6 +20,7 @@ static void handle_element(void *udata, const char *name,
         fprintf(F, "%d ", keyv[i]);
     }
     fputc('\n', F);
+    return CR_ERROR_NONE;
 }
 
 static void handle_property(void *udata, const char *name, const char *value) {

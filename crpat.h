@@ -14,6 +14,7 @@ enum CR_Error {
     CR_ERROR_NONE,
     CR_ERROR_NO_MEMORY,
     CR_ERROR_SYNTAX,
+    CR_ERROR_GRAMMAR,
     CR_ERROR_SUSPENDED,
     CR_ERROR_FINISHED,
 };
@@ -24,7 +25,7 @@ void CR_ParserReset(CR_Parser parser);
 
 enum CR_Status CR_StopParser(CR_Parser parser);
 
-typedef void(*CR_ElementHandler) (void *userData, const char *name,
+typedef enum CR_Error(*CR_ElementHandler) (void *userData, const char *name,
     unsigned int keyc, int keyv[]);
 typedef void(*CR_PropertyHandler) (void *userData, const char *name,
     const char *value);
