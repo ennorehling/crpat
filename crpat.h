@@ -1,5 +1,6 @@
 #pragma once
 
+#include <stddef.h>
 struct CR_ParserStruct;
 typedef struct CR_ParserStruct *CR_Parser;
 
