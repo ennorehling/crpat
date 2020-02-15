@@ -11,7 +11,7 @@
 #include <string.h>
 #include <errno.h>
 
-static int handle_element(void *udata, const char *name, 
+static enum CR_Error handle_element(void *udata, const char *name, 
                            unsigned int keyc, int keyv[]) {
     FILE * F = (FILE *)udata;
     unsigned int i;
