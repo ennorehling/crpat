@@ -283,6 +283,7 @@ const char *CR_ErrorString(enum CR_Error code)
         return NULL;
     case CR_ERROR_NO_MEMORY:
         return CR_T("out of memory");
+    case CR_ERROR_GRAMMAR:
     case CR_ERROR_SYNTAX:
         return CR_T("syntax error");
     case CR_ERROR_SUSPENDED:
