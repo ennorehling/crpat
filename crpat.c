@@ -21,6 +21,7 @@ struct CR_ParserStruct {
     CR_ElementHandler m_elementHandler;
     CR_PropertyHandler m_propertyHandler;
     CR_NumberHandler m_numberHandler;
+    CR_LocationHandler m_locationHandler;
     CR_TextHandler m_textHandler;
     enum CR_Error m_errorCode;
     int m_lineNumber;
@@ -83,6 +84,11 @@ void CR_SetPropertyHandler(CR_Parser parser, CR_PropertyHandler handler)
 void CR_SetNumberHandler(CR_Parser parser, CR_NumberHandler handler)
 {
     parser->m_numberHandler = handler;
+}
+
+void CR_SetLocationHandler(CR_Parser parser, CR_LocationHandler handler)
+{
+    parser->m_locationHandler = handler;
 }
 
 void CR_SetTextHandler(CR_Parser parser, CR_TextHandler handler)
@@ -194,7 +200,11 @@ static enum CR_Error handle_line(CR_Parser parser, char * s, size_t len) {
         /* integer property */
         if (*src == '\0' && parser->m_numberHandler) {
             parser->m_numberHandler(parser->m_userData, name, num);
-        } else if (parser->m_propertyHandler) {
+        }
+        else if (*src == ' ' && parser->m_locationHandler) {
+            parser->m_locationHandler(parser->m_userData, name, s);
+        }
+        else if (parser->m_propertyHandler) {
             parser->m_propertyHandler(parser->m_userData, name, s);
         }
     }
