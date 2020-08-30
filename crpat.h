@@ -27,11 +27,11 @@ enum CR_Status CR_StopParser(CR_Parser parser);
 
 typedef enum CR_Error(*CR_ElementHandler) (void *userData, const char *name,
     unsigned int keyc, int keyv[]);
-typedef void(*CR_PropertyHandler) (void *userData, const char *name,
+typedef enum CR_Error(*CR_PropertyHandler) (void *userData, const char *name,
     const char *value);
-typedef void(*CR_LocationHandler) (void *userData, const char *name, const char *value);
-typedef void(*CR_NumberHandler) (void *userData, const char *name, long value);
-typedef void(*CR_TextHandler) (void *userData, const char *value);
+typedef enum CR_Error(*CR_LocationHandler) (void *userData, const char *name, const char *value);
+typedef enum CR_Error(*CR_NumberHandler) (void *userData, const char *name, long value);
+typedef enum CR_Error(*CR_TextHandler) (void *userData, const char *value);
 
 void CR_SetElementHandler(CR_Parser parser, CR_ElementHandler handler);
 void CR_SetPropertyHandler(CR_Parser parser, CR_PropertyHandler handler);

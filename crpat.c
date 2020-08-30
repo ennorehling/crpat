@@ -132,6 +132,7 @@ static enum CR_Error buffer_append(CR_Parser parser, const char *s, size_t len)
 }
 
 static enum CR_Error handle_line(CR_Parser parser, char * s, size_t len) {
+    enum CR_Error err = CR_ERROR_NONE;
     char ch = s[0];
     if (ch == '\"') {
         if (len <= 1) {
@@ -150,18 +151,18 @@ static enum CR_Error handle_line(CR_Parser parser, char * s, size_t len) {
                         p = p + 1;
                     }
                 }
-                parser->m_textHandler(parser->m_userData, s + 1);
+                err = parser->m_textHandler(parser->m_userData, s + 1);
             }
         }
         else {
             /* must be a string property */
             char *q = strrchr(s, '\"');
             if (!q || q[1] != ';') {
-                return CR_ERROR_SYNTAX;
+                err = CR_ERROR_SYNTAX;
             }
-            if (parser->m_propertyHandler) {
+            else if (parser->m_propertyHandler) {
                 *q = '\0';
-                parser->m_propertyHandler(parser->m_userData, q + 2, s + 1);
+                err = parser->m_propertyHandler(parser->m_userData, q + 2, s + 1);
             }
         }
     }
@@ -171,7 +172,6 @@ static enum CR_Error handle_line(CR_Parser parser, char * s, size_t len) {
             unsigned int i = 0;
             const char *name = s;
             int keys[CR_MAXATTR];
-            enum CR_Error err;
             while (s && *s && i < CR_MAXATTR) {
                 char * p = memchr(s, ' ', len);
                 if (p) {
@@ -183,35 +183,40 @@ static enum CR_Error handle_line(CR_Parser parser, char * s, size_t len) {
                 }
             }
             err = parser->m_elementHandler(parser->m_userData, name, i, keys);
-            if (err != CR_ERROR_NONE) {
-                return err;
-            }
         }
     }
     else if (ch == '-' || (ch >= '0' && ch <= '9')) {
         long num;
         char *src, *name = memchr(s, ';', len);
         if (!name) {
-            return CR_ERROR_SYNTAX;
+            err = CR_ERROR_SYNTAX;
         }
-        *name++ = '\0';
-        num = strtol(s, &src, 10);
+        else {
+            *name++ = '\0';
+            num = strtol(s, &src, 10);
 
-        /* integer property */
-        if (*src == '\0' && parser->m_numberHandler) {
-            parser->m_numberHandler(parser->m_userData, name, num);
-        }
-        else if (*src == ' ' && parser->m_locationHandler) {
-            parser->m_locationHandler(parser->m_userData, name, s);
-        }
-        else if (parser->m_propertyHandler) {
-            parser->m_propertyHandler(parser->m_userData, name, s);
+            /* integer property */
+            if (*src == '\0' && parser->m_numberHandler) {
+                err = parser->m_numberHandler(parser->m_userData, name, num);
+            }
+            else if (*src == ' ' && parser->m_locationHandler) {
+                err = parser->m_locationHandler(parser->m_userData, name, s);
+            }
+            else if (parser->m_propertyHandler) {
+                err = parser->m_propertyHandler(parser->m_userData, name, s);
+            }
+            else {
+                err = CR_ERROR_SYNTAX;
+            }
         }
     }
     else {
         return CR_ERROR_SYNTAX;
     }
-    return parser->m_errorCode;
+    if (parser->m_errorCode != CR_ERROR_NONE) {
+        return parser->m_errorCode;
+    }
+    return err;
 }
 
 static enum CR_Status parse_buffer(CR_Parser parser, int isFinal)
