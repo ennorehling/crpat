@@ -23,14 +23,16 @@ static enum CR_Error handle_element(void *udata, const char *name,
     return CR_ERROR_NONE;
 }
 
-static void handle_property(void *udata, const char *name, const char *value) {
+static enum CR_Error handle_property(void *udata, const char *name, const char *value) {
     FILE * F = (FILE *)udata;
     fprintf(F, "%s: %s\n", name, value);
+    return CR_ERROR_NONE;
 }
 
-static void handle_text(void *udata, const char *text) {
+static enum CR_Error handle_text(void *udata, const char *text) {
     FILE * F = (FILE *)udata;
     fputs(text, F);
+    return CR_ERROR_NONE;
 }
 
 int main(int argc, char **argv) {
