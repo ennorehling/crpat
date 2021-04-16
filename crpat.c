@@ -158,7 +158,7 @@ static enum CR_Error handle_line(CR_Parser parser, char * s, size_t len) {
             /* must be a string property */
             char *q = strrchr(s, '\"');
             if (!q || q[1] != ';') {
-                err = CR_ERROR_SYNTAX;
+                return CR_ERROR_SYNTAX;
             }
             else if (parser->m_propertyHandler) {
                 *q = '\0';
@@ -189,24 +189,25 @@ static enum CR_Error handle_line(CR_Parser parser, char * s, size_t len) {
         long num;
         char *src, *name = memchr(s, ';', len);
         if (!name) {
-            err = CR_ERROR_SYNTAX;
+            return CR_ERROR_SYNTAX;
         }
         else {
             *name++ = '\0';
             num = strtol(s, &src, 10);
 
             /* integer property */
-            if (*src == '\0' && parser->m_numberHandler) {
-                err = parser->m_numberHandler(parser->m_userData, name, num);
+            if (*src == '\0') {
+                if (parser->m_numberHandler) {
+                    err = parser->m_numberHandler(parser->m_userData, name, num);
+                }
             }
-            else if (*src == ' ' && parser->m_locationHandler) {
-                err = parser->m_locationHandler(parser->m_userData, name, s);
+            else if (*src == ' ') {
+                if (parser->m_locationHandler) {
+                    err = parser->m_locationHandler(parser->m_userData, name, s);
+                }
             }
-            else if (parser->m_propertyHandler) {
+            if (parser->m_propertyHandler) {
                 err = parser->m_propertyHandler(parser->m_userData, name, s);
-            }
-            else {
-                err = CR_ERROR_SYNTAX;
             }
         }
     }
