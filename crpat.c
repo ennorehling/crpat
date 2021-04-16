@@ -199,11 +199,13 @@ static enum CR_Error handle_line(CR_Parser parser, char * s, size_t len) {
             if (*src == '\0') {
                 if (parser->m_numberHandler) {
                     err = parser->m_numberHandler(parser->m_userData, name, num);
+                    goto line_done;
                 }
             }
             else if (*src == ' ') {
                 if (parser->m_locationHandler) {
                     err = parser->m_locationHandler(parser->m_userData, name, s);
+                    goto line_done;
                 }
             }
             if (parser->m_propertyHandler) {
@@ -214,6 +216,7 @@ static enum CR_Error handle_line(CR_Parser parser, char * s, size_t len) {
     else {
         return CR_ERROR_SYNTAX;
     }
+line_done:
     if (parser->m_errorCode != CR_ERROR_NONE) {
         return parser->m_errorCode;
     }
