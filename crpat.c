@@ -5,6 +5,7 @@
 #include "crpat.h"
 
 #include <assert.h>
+#include <errno.h>
 #include <string.h>
 #include <stdlib.h>
 
