@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stddef.h>
+#include <stdio.h>
 struct CR_ParserStruct;
 typedef struct CR_ParserStruct *CR_Parser;
 
@@ -22,8 +23,9 @@ enum CR_Error {
 CR_Parser CR_ParserCreate(void);
 void CR_ParserFree(CR_Parser parser);
 void CR_ParserReset(CR_Parser parser);
-
 enum CR_Status CR_StopParser(CR_Parser parser);
+
+int CR_ReadFile(CR_Parser parser, const char *filename);
 
 typedef enum CR_Error(*CR_ElementHandler) (void *userData, const char *name,
     unsigned int keyc, int keyv[]);

@@ -322,3 +322,49 @@ void *CR_GetUserData(CR_Parser parser)
 {
     return parser->m_userData;
 }
+
+int CR_ReadFile(CR_Parser parser, const char *filename)
+{
+    int err = 0;
+    unsigned char buf[2048];
+    int done = 0;
+    size_t len;
+    const char *line = (const char *)buf;
+    FILE *F = fopen(filename, "rt");
+
+    if (F == NULL) {
+        return EINVAL;
+    }
+
+    len = fread(buf, 1, sizeof(buf), F);
+    if (len >= 3 && buf[0] == 0xef) {
+        /* skip BOM */
+        len -= 3;
+        line += 3;
+        printf("BOM found\n");
+    }
+
+    while (!done) {
+        if (ferror(F)) {
+            fprintf(stderr,
+                "read error at line %d of %s: %s\n",
+                CR_GetCurrentLineNumber(parser),
+                filename, strerror(errno));
+            err = errno;
+            break;
+        }
+        done = feof(F);
+        if (CR_Parse(parser, line, len, done) == CR_STATUS_ERROR) {
+            fprintf(stderr,
+                "parse error at line %d of %s: %s\n",
+                CR_GetCurrentLineNumber(parser),
+                filename, CR_ErrorString(CR_GetErrorCode(parser)));
+            err = -1;
+            break;
+        }
+        len = fread(buf, 1, sizeof(buf), F);
+        line = (const char *)buf;
+    }
+    fclose(F);
+    return err;
+}
