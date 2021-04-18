@@ -1,3 +1,7 @@
+#ifdef _MSC_VER
+#define _CRT_SECURE_NO_WARNINGS
+#endif
+
 #include "crpat.h"
 
 #include <assert.h>
@@ -341,7 +345,6 @@ int CR_ReadFile(CR_Parser parser, const char *filename)
         /* skip BOM */
         len -= 3;
         line += 3;
-        printf("BOM found\n");
     }
 
     while (!done) {
