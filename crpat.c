@@ -123,13 +123,13 @@ static enum CR_Error buffer_append(CR_Parser parser, const char *s, size_t len)
         char * buffer;
         total += (parser->m_bufferEnd - parser->m_bufferPtr);
         buffer = malloc(total);
+        if (!buffer) {
+            return CR_ERROR_NO_MEMORY;
+        }
         memcpy(buffer, parser->m_bufferPtr, total - len);
         memcpy(buffer + total - len, s, len);
         free(parser->m_buffer);
         parser->m_buffer = buffer;
-        if (!parser->m_buffer) {
-            return CR_ERROR_NO_MEMORY;
-        }
         parser->m_bufferPtr = parser->m_buffer;
         parser->m_bufferEnd = parser->m_buffer + total;
     }
