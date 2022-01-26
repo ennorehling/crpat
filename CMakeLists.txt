@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8...3.13)
+cmake_minimum_required(VERSION 3.12)
 project (crpat C)
 
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
