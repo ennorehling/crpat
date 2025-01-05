@@ -138,7 +138,7 @@ static enum CR_Error buffer_append(CR_Parser parser, const char *s, size_t len)
 
 static enum CR_Error handle_line(CR_Parser parser, char * s, size_t len) {
     enum CR_Error err = CR_ERROR_NONE;
-    char ch = s[0];
+    unsigned char ch = *(unsigned char *)s;
     if (ch == '\"') {
         if (len <= 1) {
             return CR_ERROR_SYNTAX;
@@ -171,12 +171,17 @@ static enum CR_Error handle_line(CR_Parser parser, char * s, size_t len) {
             }
         }
     }
-    else if (ch >= 'A' && ch <= 'Z') {
+    else if (ch == 0xef || (ch >= 'A' && ch <= 'Z')) {
         /* new element */
         if (parser->m_elementHandler) {
             unsigned int i = 0;
-            const char *name = s;
+            const char *name;
             int keys[CR_MAXATTR];
+            if (ch == 0xef) {
+                // skip BOM
+                s += 3;
+            }
+            name = s;
             while (s && *s && i < CR_MAXATTR) {
                 char * p = memchr(s, ' ', len);
                 if (p) {
