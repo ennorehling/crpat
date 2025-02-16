@@ -110,19 +110,20 @@ static void buffer_free(CR_Parser parser)
 static enum CR_Error buffer_append(CR_Parser parser, const char *s, size_t len)
 {
     if (parser->m_buffer == NULL) {
-        parser->m_buffer = malloc(len);
+        parser->m_buffer = malloc(len + 1);
         if (!parser->m_buffer) {
             return CR_ERROR_NO_MEMORY;
         }
         memcpy(parser->m_buffer, s, len);
         parser->m_bufferPtr = parser->m_buffer;
         parser->m_bufferEnd = parser->m_buffer + len;
+        parser->m_buffer[len] = 0;
     }
     else {
         size_t total = len;
         char * buffer;
         total += (parser->m_bufferEnd - parser->m_bufferPtr);
-        buffer = malloc(total);
+        buffer = malloc(total + 1);
         if (!buffer) {
             return CR_ERROR_NO_MEMORY;
         }
@@ -132,6 +133,7 @@ static enum CR_Error buffer_append(CR_Parser parser, const char *s, size_t len)
         parser->m_buffer = buffer;
         parser->m_bufferPtr = parser->m_buffer;
         parser->m_bufferEnd = parser->m_buffer + total;
+        parser->m_buffer[total] = 0;
     }
     return CR_ERROR_NONE;
 }
